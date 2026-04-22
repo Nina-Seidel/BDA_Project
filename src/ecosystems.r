@@ -1,0 +1,100 @@
+### ADDING ECOSYSTEM DATA TO SPECIES OCCURRENCE COORDINATES
+
+##1. Load the ecosystem raster
+# Define the path to the GeoTIFF file
+file_path <- "./data/WorldEcosystem.tif"
+
+# Read the raster layer
+# This raster contains ecosystem categories coded as numeric values
+ecosystem_raster <- raster(file_path)
+
+# Display basic information about the raster
+print(ecosystem_raster)
+
+#plot the full raster
+plot(ecosystem_raster, main = "Original Ecosystem Raster")
+
+##2. Load the boundary of Switzerland
+# Download the country boundary as an sf object
+Switzerland <- ne_countries(
+  scale = "medium",
+  returnclass = "sf",
+  country = "Switzerland"
+)
+
+# Plot the country boundary
+windows()
+plot(st_geometry(Switzerland), main = "Boundary of Switzerland")
+
+##3. Crop and mask the raster to Switzerland
+# crop() keeps only the rectangular extent around Switzerland
+r2 <- crop(ecosystem_raster, extent(Switzerland))
+
+# mask() keeps only the pixels that fall inside the country boundary
+ecosystem_switzerland <- mask(r2, Switzerland)
+
+# Plot the cropped and masked raster
+plot(ecosystem_switzerland, main = "Ecosystem Raster Restricted to Switzerland")
+
+##4. Convert species coordinates into spatial points
+# Convert the coordinate columns into spatial points
+# The CRS used here is WGS84, which is the standard geographic coordinate system
+spatial_points <- SpatialPoints(
+  coords = matrix_full[, c("longitude", "latitude")],
+  proj4string = CRS("+proj=longlat +datum=WGS84")
+)
+
+# Add the occurrence points on top of the ecosystem map
+plot(ecosystem_switzerland, main = "Species Occurrences on Ecosystem Map")
+plot(spatial_points, add = TRUE, pch = 16, cex = 1.2)
+
+##5. Extract ecosystem values at each occurence point
+# extract() retrieves the raster value at the location of each point
+# Each point receives the ecosystem code of the raster cell where it falls
+eco_values <- raster::extract(ecosystem_switzerland, spatial_points)
+
+# Check the extracted values
+head(eco_values)
+
+##6. Add the extracted ecosystem values to the original data frame
+# Create a new data frame by adding the extracted ecosystem values
+matrix_full_eco <- data.frame(matrix_full, eco_values)
+
+# Inspect the result
+head(matrix_full_eco)
+
+##7. Load the ecosystem metadata table
+# This metadata table links the numeric raster code to descriptive ecosystem names
+metadata_eco <- read.delim("./data/WorldEcosystem.metadata.tsv")
+
+# Inspect the metadata table
+head(metadata_eco)
+
+##8. Merge the extracted values with the metadata
+# Merge the occurrence table with the metadata table
+# by.x = "eco_values" means the ecosystem code in our occurrence table
+# by.y = "Value" means the corresponding code column in the metadata table
+matrix_full_eco <- merge(
+  matrix_full_eco,
+  metadata_eco,
+  by.x = "eco_values",
+  by.y = "Value"
+)
+
+# Inspect the enriched table
+head(matrix_full_eco)
+
+##9. Vizualize the number of observations per climate category and species
+# Create a bar plot showing how many observations of each species
+# are found in each climate category
+p2 <- ggplot(matrix_full_eco, aes(x = Climate_Re, fill = species)) +
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Count of Observations of Each Species by Climate",
+    x = "Climate category",
+    y = "Number of observations"
+  ) +
+  theme_minimal()
+
+# Display the plot -> en lançant le code depuis src, il faut faire print, sinon ça s'affiche pas
+print(p2)
