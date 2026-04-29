@@ -1,4 +1,4 @@
-### Extracting elevation data in Switzerland and visualisation
+### Script pour extraire les data d'elevation en Suisse + visualisation
 
 # Disable s2 geometry engine (can avoid issues in some spatial operations)
 sf_use_s2(FALSE)

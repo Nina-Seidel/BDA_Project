@@ -1,4 +1,4 @@
-### ADDING ECOSYSTEM DATA TO SPECIES OCCURRENCE COORDINATES
+### Script pour ajouter les data d'ecosystèmes aux coordonnées des occurences des espèces
 
 ##1. Load the ecosystem raster
 # Define the path to the GeoTIFF file
