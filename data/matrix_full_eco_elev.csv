@@ -1,4 +1,4 @@
-"eco_values","species","latitude","longitude","source","Temperatur","Moisture","Landcover","Landforms","Climate_Re","Red","Green","Blue","W_Ecosystm","color","elevation"
+"eco_code","species","latitude","longitude","source","Temperatur","Moisture","Landcover","Landforms","Climate_Re","Red","Green","Blue","W_Ecosystm","color","elevation"
 5,"Bombus terrestris",46.4903908714,7.6205415311,"inat","Polar","Moist","Sparsely or Non vegetated","Mountains","Polar Moist",156,150,138,"Polar Moist Sparsely or Non vegetated on Mountains","#9C968A",2431
 5,"Dactylorhiza sambucina",46.2443862686,7.1443609592,"inat","Polar","Moist","Sparsely or Non vegetated","Mountains","Polar Moist",156,150,138,"Polar Moist Sparsely or Non vegetated on Mountains","#9C968A",2567
 18,"Dactylorhiza sambucina",46.34333,7.79584,"gbif","Polar","Moist","Grassland","Mountains","Polar Moist",191,167,132,"Polar Moist Grassland on Mountains","#BFA784",2178

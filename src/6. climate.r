@@ -9,14 +9,14 @@ data_climate <- data_climate %>%
 
 ##3. Créer un tableau avec les coordonnées
 coords_df <- data_climate %>%
-  select(longitude, latitude, occurrence_id)
+  dplyr::select(longitude, latitude, occurrence_id)
 
 head(coords_df)
 
 ##4. Extraire la température (Tmax)
 tmax_r <- getChelsa(
   var       = "tasmax",
-  coords    = coords_df %>% select(longitude, latitude),
+  coords    = coords_df %>% dplyr::select(longitude, latitude),
   startdate = as.Date("2018-01-01"),
   enddate   = as.Date("2019-01-01"),
   dataset   = "chelsa-monthly"
@@ -24,7 +24,7 @@ tmax_r <- getChelsa(
 
 # Transformer en matrice et calculer la moyenne annuelle
 tmax_mat <- tmax_r %>%
-  select(-time) %>%
+  dplyr::select(-time) %>%
   as.matrix()
 
 tmax_mean_c <- colMeans(tmax_mat, na.rm = TRUE) - 273.15
