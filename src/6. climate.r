@@ -73,7 +73,6 @@ summary(matrix_full_final)
 write.csv(matrix_full_final, "data/matrix_full_final.csv", row.names = FALSE)
 
 ##9. Visualisation simple
-
 # Température
 p_temp <- ggplot(matrix_full_final, aes(x = tmax_mean_c, fill = species)) +
   geom_density(alpha = 0.5) +

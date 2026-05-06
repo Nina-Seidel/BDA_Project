@@ -49,3 +49,6 @@ p3 <- ggplot(matrix_full_eco_elev, aes(x = elevation, fill = Climate_Re)) +
 
 # Display the plot
 print(p3)
+
+##7. Création du fichier csv
+write.csv(matrix_full_eco_elev, "data/matrix_full_eco_elev.csv", row.names = FALSE)

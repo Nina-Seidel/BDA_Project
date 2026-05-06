@@ -60,3 +60,23 @@ summary(data_bumblebee)
 
 ##10. Création du fichier csv
 write.csv(data_bumblebee, "data/data_bumblebee.csv", row.names = FALSE)
+
+##11. Visualisation des occurrences
+Switzerland <- ne_countries(
+  scale = "medium",
+  returnclass = "sf",
+  country = "Switzerland"
+)
+
+p_bumblebee <- ggplot(data = Switzerland) +
+  geom_sf(fill = "grey95") +
+  geom_point(
+    data = data_bumblebee,
+    aes(x = longitude, y = latitude),
+    color = "darkorange",
+    size = 2
+  ) +
+  theme_classic() +
+  labs(title = "Occurrences de Bombus terrestris en Suisse")
+
+print(p_bumblebee)

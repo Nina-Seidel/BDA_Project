@@ -98,3 +98,6 @@ p2 <- ggplot(matrix_full_eco, aes(x = Climate_Re, fill = species)) +
 
 # Display the plot -> en lançant le code depuis src, il faut faire print, sinon ça s'affiche pas
 print(p2)
+
+##10. Création du fichier csv
+write.csv(matrix_full_eco, "data/matrix_full_eco.csv", row.names = FALSE)

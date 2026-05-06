@@ -40,10 +40,17 @@ data_inat <- data.frame(
   species   = inat_raw$scientific_name,
   latitude  = inat_raw$latitude,
   longitude = inat_raw$longitude,
+  captive   = inat_raw$captive_cultivated,
   source    = "inat"
 )
 
+#Supprimer les observations captives
+data_inat <- data_inat %>%
+  filter(captive == FALSE | is.na(captive)) %>%
+  select(-captive)
+
 head(data_inat)
+colnames(data_inat)
 summary(data_inat)
 
 ##8. Stack les données GBIF et iNat
@@ -53,9 +60,32 @@ data_orchid <- bind_rows(data_gbif, data_inat)
 #donc les coordonnées complètes)
 data_orchid <- data_orchid %>%
   filter(!is.na(latitude), !is.na(longitude))
+  select(-captive)
 
 head(data_orchid)
 summary(data_orchid)
 
 ##10. Création du fichier csv
 write.csv(data_orchid, "data/data_orchid.csv", row.names = FALSE)
+
+##11. Visualisation des occurrences
+Switzerland <- ne_countries(
+  scale = "medium",
+  returnclass = "sf",
+  country = "Switzerland"
+)
+
+p_orchid <- ggplot(data = Switzerland) +
+  geom_sf(fill = "grey95") +
+  geom_point(
+    data = data_orchid,
+    aes(x = longitude, y = latitude),
+    color = "darkgreen",
+    size = 2
+  ) +
+  theme_classic() +
+  labs(title = "Occurrences de Dactylorhiza sambucina en Suisse")
+
+print(p_orchid)
+
+summary(data_orchid)
