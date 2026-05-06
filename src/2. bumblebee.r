@@ -41,10 +41,18 @@ data_inat <- data.frame(
   species   = inat_raw$scientific_name,
   latitude  = inat_raw$latitude,
   longitude = inat_raw$longitude,
+  captive   = inat_raw$captive_cultivated,
   source    = "inat"
 )
 
+# Supprimer les observations captives
+data_inat <- data_inat %>%
+  filter(captive == "false" | is.na(captive)) %>%
+  dplyr::select(-captive) 
+#Le dplyr c'est pour activer la bonne fonction select, car sinon il y a un conflit de packages
+
 head(data_inat)
+colnames(data_inat)
 summary(data_inat)
 
 ##8. Stack les données GBIF et iNat
@@ -68,6 +76,7 @@ Switzerland <- ne_countries(
   country = "Switzerland"
 )
 
+windows()
 p_bumblebee <- ggplot(data = Switzerland) +
   geom_sf(fill = "grey95") +
   geom_point(
