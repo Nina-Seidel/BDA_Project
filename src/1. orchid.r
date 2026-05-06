@@ -40,14 +40,8 @@ data_inat <- data.frame(
   species   = inat_raw$scientific_name,
   latitude  = inat_raw$latitude,
   longitude = inat_raw$longitude,
-  captive   = inat_raw$captive_cultivated,
   source    = "inat"
 )
-
-#Supprimer les observations captives
-data_inat <- data_inat %>%
-  filter(captive == FALSE | is.na(captive)) %>%
-  select(-captive)
 
 head(data_inat)
 colnames(data_inat)
@@ -60,7 +54,6 @@ data_orchid <- bind_rows(data_gbif, data_inat)
 #donc les coordonnées complètes)
 data_orchid <- data_orchid %>%
   filter(!is.na(latitude), !is.na(longitude))
-  select(-captive)
 
 head(data_orchid)
 summary(data_orchid)
@@ -87,5 +80,3 @@ p_orchid <- ggplot(data = Switzerland) +
   labs(title = "Occurrences de Dactylorhiza sambucina en Suisse")
 
 print(p_orchid)
-
-summary(data_orchid)
