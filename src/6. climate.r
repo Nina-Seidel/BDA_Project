@@ -1,98 +1,104 @@
-### Script pour ajouter les données climatiques au projet
+### Script to add climate data to the project
 
-##1. Charger le dataset existant (avec écosystème + altitude)
-data_climate <- matrix_full_eco_elev
+##1. Load dataset (ecosystem + elevation)
+matrix_full_eco_elev <- read.csv("data/matrix_full_eco_elev.csv")
 
-##2. Ajouter un ID unique pour chaque occurrence
-data_climate <- data_climate %>%
-  mutate(occurrence_id = 1:n())
+head(matrix_full_eco_elev)
+summary(matrix_full_eco_elev)
 
-##3. Créer un tableau avec les coordonnées
-coords_df <- data_climate %>%
-  dplyr::select(longitude, latitude, occurrence_id)
+##2. Create unique coordinate table
+coords_unique <- matrix_full_eco_elev %>%
+  dplyr::select(longitude, latitude) %>%
+  distinct()
 
-head(coords_df)
+head(coords_unique)
 
-##4. Extraire la température (Tmax)
+##3. Extract temperature (Tmax)
 tmax_r <- getChelsa(
   var       = "tasmax",
-  coords    = coords_df %>% dplyr::select(longitude, latitude),
+  coords    = coords_unique,
   startdate = as.Date("2018-01-01"),
   enddate   = as.Date("2019-01-01"),
   dataset   = "chelsa-monthly"
 )
 
-# Transformer en matrice et calculer la moyenne annuelle
+# Convert to matrix and compute annual mean
 tmax_mat <- tmax_r %>%
   dplyr::select(-time) %>%
   as.matrix()
 
 tmax_mean_c <- colMeans(tmax_mat, na.rm = TRUE) - 273.15
 
-# Créer un tableau température
-tmax_df <- data.frame(
-  occurrence_id = coords_df$occurrence_id,
-  tmax_mean_c = as.numeric(tmax_mean_c)
-)
+# Create temperature dataframe (linked to coordinates)
+tmax_df <- coords_unique %>%
+  mutate(tmax_mean_c = as.numeric(tmax_mean_c))
 
 head(tmax_df)
 
-##5. Extraire les précipitations
+##4. Extract precipitation
 prec_r <- getChelsa(
   var       = "pr",
-  coords    = coords_df %>% select(longitude, latitude),
+  coords    = coords_unique,
   startdate = as.Date("2018-01-01"),
   enddate   = as.Date("2019-01-01"),
   dataset   = "chelsa-monthly"
 )
 
-# Transformer en matrice et calculer la moyenne annuelle
+# Convert to matrix and compute annual mean
 prec_mat <- prec_r %>%
-  select(-time) %>%
+  dplyr::select(-time) %>%
   as.matrix()
 
 prec_mean <- colMeans(prec_mat, na.rm = TRUE)
 
-# Créer un tableau précipitations
-prec_df <- data.frame(
-  occurrence_id = coords_df$occurrence_id,
-  prec_mean_annual = as.numeric(prec_mean)
-)
+# Create precipitation dataframe
+prec_df <- coords_unique %>%
+  mutate(prec_mean_annual = as.numeric(prec_mean))
 
 head(prec_df)
 
-##7. Ajouter les variables climatiques au dataset
-matrix_full_final <- data_climate %>%
-  left_join(tmax_df, by = "occurrence_id") %>%
-  left_join(prec_df, by = "occurrence_id")
+##5. Merge climate variables with dataset (join by coordinates)
+matrix_full_climate <- matrix_full_eco_elev %>%
+  left_join(tmax_df, by = c("longitude", "latitude")) %>%
+  left_join(prec_df, by = c("longitude", "latitude"))
 
-head(matrix_full_final)
-summary(matrix_full_final)
+head(matrix_full_climate)
+summary(matrix_full_climate)
 
-##8. Sauvegarder le dataset final
-write.csv(matrix_full_final, "data/matrix_full_final.csv", row.names = FALSE)
+##6. Save dataset
+write.csv(
+  matrix_full_climate,
+  "data/matrix_full_climate.csv",
+  row.names = FALSE
+)
 
-##9. Visualisation simple
-# Température
-p_temp <- ggplot(matrix_full_final, aes(x = tmax_mean_c, fill = species)) +
+##7. Visualization
+# Clean data for plotting
+plot_data <- matrix_full_climate %>%
+  filter(!is.na(tmax_mean_c), !is.na(prec_mean_annual))
+
+windows()
+
+# Temperature
+p_temp <- ggplot(plot_data, aes(x = tmax_mean_c, fill = species)) +
   geom_density(alpha = 0.5) +
   theme_classic() +
   labs(
-    title = "Distribution de la température par espèce",
-    x = "Température moyenne annuelle (°C)",
-    y = "Densité"
+    title = "Temperature distribution by species",
+    x = "Annual mean temperature (°C)",
+    y = "Density"
   )
 
 print(p_temp)
 
-# Précipitations
-p_prec <- ggplot(matrix_full_final, aes(x = prec_mean_annual, fill = species)) +
+# Precipitation
+p_prec <- ggplot(plot_data, aes(x = prec_mean_annual, fill = species)) +
   geom_density(alpha = 0.5) +
   theme_classic() +
   labs(
-    title = "Distribution des précipitations par espèce",
-    x = "Précipitations annuelles",
-    y = "Densité"
+    title = "Precipitation distribution by species",
+    x = "Annual precipitation",
+    y = "Density"
   )
 
 print(p_prec)

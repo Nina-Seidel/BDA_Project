@@ -1,195 +1,89 @@
-################################################################################
-# SIMPLE MANUAL WORKFLOW:
-# EXPLORE MODIS PRODUCTS, DOWNLOAD NDVI MANUALLY, READ IT IN R,
-# EXTRACT VALUES AT POINT LOCATIONS, AND ADD THEM TO THE DATA TABLE
-################################################################################
+### Script to add satellite (NDVI) data to the project
 
-# ==============================================================================
-# 1. Load required packages
-# ==============================================================================
+##1. Load dataset (with climate)
+matrix_full_climate <- read.csv("data/matrix_full_climate.csv")
 
-install.packages('luna', repos='https://rspatial.r-universe.dev')
-library(luna)
-library(MODIStsp)
+head(matrix_full_climate)
+summary(matrix_full_climate)
 
-library(appeears)
-library(terra)
-library(sf)
-library(rnaturalearth)
-library(ggplot2)
-library(dplyr)
+##2. Load NDVI raster (downloaded manually from AppEEARS)
+ndvi_path <- "./data/modis"
 
-# ------------------------------------------------------------------------------
-# Optional installation
-#install.packages(c("appeears", "terra", "sf", "rnaturalearth", "ggplot2", "dplyr"))
-# ------------------------------------------------------------------------------
-
-
-# ==============================================================================
-# 2. Explore available MODIS products
-# ==============================================================================
-# List all products available through AppEEARS
-products <- rs_products()
-
-# Display the first rows
-head(products)
-
-
-getProducts("^MOD|^MYD|^MCD")
-
-#MOD = Terra satellite products
-
-#MYD = Aqua satellite products
-
-#MCD = Combined products (Terra + Aqua)
-
-MODIStsp_get_prodlayers("M*D13Q1")
-
-product <- "MOD09A1" #surface spectral reflectance of Terra
-#product <- "MOD13Q1" # NDVI
-
-productInfo(product)
-
-# IMPORTANT:
-# Look for the NDVI layer name in the printed list.
-# This is the layer you will select manually in AppEEARS.
-
-
-# ==============================================================================
-# 4. Export the Switzerland polygon for manual upload in AppEEARS
-# ==============================================================================
-# This file can be uploaded directly in the AppEEARS web interface
-# when creating an area request.
-
-switzerland_sf <- ne_countries(
-  scale = "medium",
-  country = "Switzerland",
-  returnclass = "sf"
-)
-
-dir.create(".data", showWarnings = FALSE)
-
-st_write(
-  switzerland_sf,
-  ".data/switzerland.geojson",
-  delete_dsn = TRUE
-)
-
-plot(st_geometry(switzerland_sf), col = "lightgray", main = "Switzerland")
-
-# ------------------------------------------------------------------------------
-# MANUAL STEP IN APP EEARS
-# ------------------------------------------------------------------------------
-# 1. Open the AppEEARS website
-# 2. Create an AREA request
-# 3. Upload the file: .data/switzerland.geojson
-# 4. Select product: MOD13Q1.061
-# 5. Select layer: NDVI
-# 6. Select the desired date range
-# 7. Choose GeoTIFF as output format if available
-# 8. Submit the task
-# 9. Download the resulting NDVI raster manually
-# 10. Save it in the folder: .data/appeears_manual_download
-# ------------------------------------------------------------------------------
-
-
-# ==============================================================================
-# 5. Read the manually downloaded NDVI raster
-# ==============================================================================
-manual_path <- "./data/modis"
-
-# List all tif files in the folder
-manual_tif <- list.files(
-  manual_path,
+ndvi_files <- list.files(
+  ndvi_path,
   pattern = "\\.tif$",
-  full.names = TRUE,
-  recursive = TRUE
+  full.names = TRUE
 )
 
-print(manual_tif)
+ndvi_raster <- rast(ndvi_files[1])
 
-# Read the first raster
-ndvi_raster <- rast(manual_tif[1])
-
-# Check raster information
-print(ndvi_raster)
-
-# Plot the raster
+# Quick visualization
 windows()
-plot(ndvi_raster, main = "Manually downloaded NDVI raster")
+plot(ndvi_raster, main = "NDVI raster")
 
+##3. Load Switzerland boundary
+Switzerland <- ne_countries(
+  scale = "medium",
+  returnclass = "sf",
+  country = "Switzerland"
+)
 
-# ==============================================================================
-# 6. Clip the raster to the exact Switzerland border
-# ==============================================================================
-switzerland_vect <- vect(switzerland_sf)
+switzerland_vect <- vect(Switzerland)
 
-# Reproject the Switzerland polygon to the raster CRS
+# Reproject to raster CRS
 switzerland_vect <- project(switzerland_vect, crs(ndvi_raster))
 
-# Crop and mask
+##4. Clip raster to Switzerland
 ndvi_switzerland <- crop(ndvi_raster, switzerland_vect)
 ndvi_switzerland <- mask(ndvi_switzerland, switzerland_vect)
 
-# Plot the clipped raster
 windows()
-plot(ndvi_switzerland, main = "NDVI raster clipped to Switzerland")
-plot(switzerland_vect, add = TRUE, border = "black", lwd = 1)
+plot(ndvi_switzerland, main = "NDVI Switzerland")
 
-
-# ==============================================================================
-# 7. Convert the sampling table to spatial points
-# ==============================================================================
-# We assume your data frame is called matrix_full_eco
-# and contains longitude and latitude columns.
-
+##5. Convert occurrences to spatial points
 points_vect <- vect(
-  matrix_full_eco,
+  matrix_full_climate,
   geom = c("longitude", "latitude"),
   crs = "EPSG:4326"
 )
 
-# Reproject the points to the raster CRS
+# Reproject to raster CRS
 points_vect <- project(points_vect, crs(ndvi_switzerland))
 
-# Plot the points on top of the raster
-plot(ndvi_switzerland, main = "Sampling points over NDVI raster")
-plot(points_vect, add = TRUE, col = "red", pch = 16)
-
-
-# ==============================================================================
-# 8. Extract NDVI values at point locations
-# ==============================================================================
+##6. Extract NDVI values
 ndvi_values <- terra::extract(ndvi_switzerland, points_vect)
 
-# Check extracted values
 head(ndvi_values)
 
+##7. Add NDVI to dataset
+matrix_full_satellite <- matrix_full_climate %>%
+  mutate(NDVI = ndvi_values[, 2])
 
-# ==============================================================================
-# 9. Add NDVI values to the original data frame
-# ==============================================================================
-# The first column returned by terra::extract() is usually the point ID
-# and the second column contains the extracted raster value.
+head(matrix_full_satellite)
+summary(matrix_full_satellite)
 
-matrix_full_eco$NDVI <- ndvi_values[, 2]
+##8. Save final dataset
+write.csv(
+  matrix_full_satellite,
+  "data/matrix_full_satellite.csv",
+  row.names = FALSE
+)
 
-# Check the updated table
-head(matrix_full_eco)
+##9. Visualization
 
-
-# ==============================================================================
-# 10. Simple control plot
-# ==============================================================================
+# Clean data for plotting
+plot_data <- matrix_full_satellite %>%
+  filter(!is.na(NDVI), !is.na(Climate_Re))
 
 windows()
 
-
-  ggplot(matrix_full_eco, aes(x = NDVI, fill = Climate_Re)) +
-  geom_density(alpha = 0.5, adjust = 3) +  # smoothed density curves
+p_ndvi <- ggplot(plot_data, aes(x = NDVI, fill = Climate_Re)) +
+  geom_density(alpha = 0.5, adjust = 3) +
+  theme_classic() +
   labs(
-    title = "NDVI Distribution by Climate",
+    title = "NDVI distribution by climate",
     x = "NDVI",
     y = "Density"
-  ) +
-  theme_minimal()
+  )
+
+print(p_ndvi)
