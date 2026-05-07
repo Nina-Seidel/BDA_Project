@@ -5,7 +5,9 @@
 #   "tidyverse", "sf", "rnaturalearth", "rnaturalearthdata",
 #   "ggplot2", "ggrepel", "ggiraph", "plotly", "leaflet",
 #   "MASS", "viridis", "elevatr", "raster", "terra", "rayshader"
-# ))
+#))
+
+install.packages('luna', repos='https://rspatial.r-universe.dev')
 
 ##Load packages
 library(rgbif) #GBIF
@@ -27,6 +29,9 @@ library(leaflet)
 library(MASS)
 library(viridis)
 library(rayshader)
+library(luna)
+library(MODIStsp)
+library(appeears)
 
 ##Run code
 source("./src/1. orchid.r")
