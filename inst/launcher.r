@@ -7,7 +7,7 @@
 #   "MASS", "viridis", "elevatr", "raster", "terra", "rayshader"
 #))
 
-install.packages('luna', repos='https://rspatial.r-universe.dev')
+#install.packages('luna', repos='https://rspatial.r-universe.dev')
 
 ##Load packages
 library(rgbif) #GBIF

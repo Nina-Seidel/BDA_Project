@@ -24,7 +24,8 @@ st_write(
 
 plot(st_geometry(switzerland_sf), col = "lightgray", main = "Switzerland")
 
-##3. Load NDVI raster (downloaded manually from AppEEARS)
+
+##3. Load and combine NDVI rasters
 ndvi_path <- "./data/modis"
 
 ndvi_files <- list.files(
@@ -33,18 +34,26 @@ ndvi_files <- list.files(
   full.names = TRUE
 )
 
-print(ndvi_files)
+print(length(ndvi_files)) #check the number of files
 
-# Stop if no raster found
-if (length(ndvi_files) == 0) {
-  stop("No NDVI raster found in ./data/modis. Please download it from AppEEARS.")
-}
+# Load ALL rasters
+ndvi_stack <- rast(ndvi_files)
 
-ndvi_raster <- rast(ndvi_files[1])
+# Compute mean NDVI across time
+ndvi_raster <- mean(ndvi_stack, na.rm = TRUE)
+
+# Check NDVI scale
+minmax(ndvi_raster)
+
+# If needed to fix scale (spoiler: yes it is):
+ndvi_raster <- ndvi_raster / 10000
+
+# Check NDVI scale
+minmax(ndvi_raster)
 
 # Quick visualization
 windows()
-plot(ndvi_raster, main = "NDVI raster (raw)")
+plot(ndvi_raster, main = "Mean NDVI (2017–2019)")
 
 
 ##4. Load Switzerland boundary
@@ -107,7 +116,6 @@ write.csv(
 
 
 ##10. Visualization
-
 # Clean data for plotting
 plot_data <- matrix_full_satellite %>%
   filter(!is.na(NDVI), !is.na(Climate_Re))
