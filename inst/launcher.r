@@ -1,12 +1,11 @@
 ### Main script to run the full analysis pipeline
 
 ##1. Install packages if necessary
-#install.packages(c(
-#   "rgbif", "rinat", "dplyr", "Rchelsa",
-#   "tidyverse", "sf", "rnaturalearth", "rnaturalearthdata",
-#   "ggplot2", "ggrepel", "Rcpp", "ggiraph", "plotly", "leaflet",
-#   "MASS", "viridis", "elevatr", "raster", "terra", "rayshader"
-#))
+# install.packages(c(
+#   "rgbif", "rinat", "dplyr", "ggplot2",
+#   "sf", "rnaturalearth", "rnaturalearthdata",
+#   "raster", "terra", "elevatr", "Rchelsa"
+# ))
 
 
 ##2. Load packages
@@ -16,7 +15,7 @@ library(dplyr)              # Data manipulation
 library(ggplot2)            # Visualisation
 library(sf)                 # Vector spatial data handling
 library(rnaturalearth)      # Country boundaries
-library(rnaturalearthdata)  
+library(rnaturalearthdata)  # Country boundaries data
 library(raster)             # Raster data handling
 library(terra)              # Raster data handling (terra is newer than raster)
 library(elevatr)            # Elevation data
