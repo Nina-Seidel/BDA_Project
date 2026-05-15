@@ -1,23 +1,27 @@
-### Script pour charger les données B. terrestris et en faire un tableau
+### Script to download occurrences of Bombus terrestris and create a dataset
 
-##1. Définition de l'espèce
+##1. Define species
 myspecies <- "Bombus terrestris"
 
-##2. Télécharger les données GBIF
+
+##2. Download GBIF data
 gbif_raw <- occ_data(
   scientificName = myspecies,
   hasCoordinate = TRUE,
   limit = 1000
 )
 
-##3. Extraire les données
+
+##3. Extract occurences
 gbif_occ <- gbif_raw$data
 
-##4. Filtrer Suisse
-gbif_ch <- gbif_occ %>%
-  filter(country == "Switzerland")
 
-##5. Tableau GBIF
+##4. Filter for Switzerland
+gbif_ch <- gbif_occ %>%
+  dplyr::filter(country == "Switzerland")
+
+
+##5. Create GBIF dataset
 data_gbif <- data.frame(
   species   = gbif_ch$species,
   latitude  = gbif_ch$decimalLatitude,
@@ -27,16 +31,18 @@ data_gbif <- data.frame(
 
 head(data_gbif)
 summary(data_gbif)
-#Que 2 points pour GBIF, mais les données iNat compensent
+#Only 2 points for GBIF, but iNaturalist data compensates
 
-##6. Télécharger les données iNaturalist
+
+##6. Download iNaturalist data
 inat_raw <- get_inat_obs(
   query = myspecies,
   place_id = "switzerland",
   maxresults = 1000
 )
 
-##7. Tableau iNat
+
+##7. Create iNaturalist dataset
 data_inat <- data.frame(
   species   = inat_raw$scientific_name,
   latitude  = inat_raw$latitude,
@@ -45,31 +51,37 @@ data_inat <- data.frame(
   source    = "inat"
 )
 
-# Supprimer les observations captives
+# Remove captive/cultivated observations
 data_inat <- data_inat %>%
-  filter(captive == "false" | is.na(captive)) %>%
+  dplyr::filter(captive == "false" | is.na(captive)) %>%
   dplyr::select(-captive) 
-#Le dplyr c'est pour activer la bonne fonction select, car sinon il y a un conflit de packages
 
 head(data_inat)
 colnames(data_inat)
 summary(data_inat)
 
-##8. Stack les données GBIF et iNat
-data_bumblebee <- bind_rows(data_gbif, data_inat)
 
-##9. Nettoyage (on garde seulement les lignes avec latitude ET longitude,
-#donc les coordonnées complètes)
+##8. Combine GBIF and iNaturalist data
+data_bumblebee <- dplyr::bind_rows(data_gbif, data_inat)
+
+
+##9. Clean dataset (keep only lines with complete coordinates)
 data_bumblebee <- data_bumblebee %>%
-  filter(!is.na(latitude), !is.na(longitude))
+  dplyr::filter(!is.na(latitude), !is.na(longitude))
 
 head(data_bumblebee)
 summary(data_bumblebee)
 
-##10. Création du fichier csv
-write.csv(data_bumblebee, "data/data_bumblebee.csv", row.names = FALSE)
 
-##11. Visualisation des occurrences
+##10. Save dataset
+write.csv(
+  data_bumblebee, 
+  "data/data_bumblebee.csv", 
+  row.names = FALSE
+)
+
+
+##11. Plot occurrences
 Switzerland <- ne_countries(
   scale = "medium",
   returnclass = "sf",
@@ -89,3 +101,12 @@ p_bumblebee <- ggplot(data = Switzerland) +
   labs(title = "Occurrences de Bombus terrestris en Suisse")
 
 print(p_bumblebee)
+
+
+##12. Save figure
+ggsave(
+  "data/figures/bumblebee_occurrences.png",
+  plot = p_bumblebee,
+  width = 6,
+  height = 5
+)

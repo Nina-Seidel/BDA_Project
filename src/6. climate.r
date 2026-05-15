@@ -6,12 +6,15 @@ matrix_full_eco_elev <- read.csv("data/matrix_full_eco_elev.csv")
 head(matrix_full_eco_elev)
 summary(matrix_full_eco_elev)
 
+
 ##2. Create unique coordinate table
+# To avoid duplicated coordinates
 coords_unique <- matrix_full_eco_elev %>%
   dplyr::select(longitude, latitude) %>%
   distinct()
 
 head(coords_unique)
+
 
 ##3. Extract temperature (Tmax)
 tmax_r <- getChelsa(
@@ -35,6 +38,7 @@ tmax_df <- coords_unique %>%
 
 head(tmax_df)
 
+
 ##4. Extract precipitation
 prec_r <- getChelsa(
   var       = "pr",
@@ -57,6 +61,7 @@ prec_df <- coords_unique %>%
 
 head(prec_df)
 
+
 ##5. Merge climate variables with dataset (join by coordinates)
 matrix_full_climate <- matrix_full_eco_elev %>%
   left_join(tmax_df, by = c("longitude", "latitude")) %>%
@@ -65,12 +70,14 @@ matrix_full_climate <- matrix_full_eco_elev %>%
 head(matrix_full_climate)
 summary(matrix_full_climate)
 
+
 ##6. Save dataset
 write.csv(
   matrix_full_climate,
   "data/matrix_full_climate.csv",
   row.names = FALSE
 )
+
 
 ##7. Visualization
 # Clean data for plotting
@@ -102,3 +109,19 @@ p_prec <- ggplot(plot_data, aes(x = prec_mean_annual, fill = species)) +
   )
 
 print(p_prec)
+
+
+##8. Save figures
+ggsave(
+  "data/figures/temperature_distribution.png", 
+  p_temp, 
+  width = 8, 
+  height = 6
+)
+
+ggsave(
+  "data/figures/precipitation_distribution.png", 
+  p_prec, 
+  width = 8, 
+  height = 6
+)

@@ -1,30 +1,33 @@
-### Script pour combiner les tableaux orchid et bumblebee
+### Script to combine orchid and bumblebee datasets
 
-##1. Lire les fichiers csv des deux espèces
+##1. Load datasets
 data_orchid <- read.csv("data/data_orchid.csv")
 data_bumblebee <- read.csv("data/data_bumblebee.csv")
 
-##2. Vérifier les noms des colonnes
-# Colonnes
+
+##2. Check structure
+# Columns should be the same for both datasets to be able to combine them
 colnames(data_orchid)
 colnames(data_bumblebee)
 
-# Aperçu
+# Overview
 str(data_orchid)
 str(data_bumblebee)
 
-##3. Combiner les deux espèces en un tableau
+
+##3. Combine the two species into a single dataset
 matrix_full <- bind_rows(data_orchid, data_bumblebee)
 
-#Nettoyage final pour être sûre
+
+##4. Final cleaning to be sure
 matrix_full <- matrix_full %>%
   filter(!is.na(latitude), !is.na(longitude))
 
 head(matrix_full)
 summary(matrix_full)
 table(matrix_full$species)
-#Apparemment il y a différents noms pour Bombus terrestris
-#Il faut corriger ça :
+#Apparently there are different names for Bombus terrestris
+#We need to correct this:
 matrix_full <- matrix_full %>%
   mutate(
     species = case_when(
@@ -33,14 +36,16 @@ matrix_full <- matrix_full %>%
     )
   )
 
-#On reteste:
+#Check again:
 table(matrix_full$species)
-#C'est parfait maintenant
+#Perfect now
 
-##4. Création d'un fichier csv
+
+##5. Save the combined dataset
 write.csv(matrix_full, "data/matrix_full.csv", row.names = FALSE)
 
-##5. Visualisation des occurences combinées
+
+##6. Plot combined occurences
 Switzerland <- ne_countries(
   scale = "medium",
   returnclass = "sf",
@@ -48,7 +53,6 @@ Switzerland <- ne_countries(
 )
 
 windows()
-
 p_full <- ggplot(data = Switzerland) +
   geom_sf(fill = "grey95") +
   geom_point(
@@ -60,3 +64,12 @@ p_full <- ggplot(data = Switzerland) +
   labs(title = "Occurrences des deux espèces en Suisse")
 
 print(p_full)
+
+
+##7. Save figure
+ggsave(
+  "data/figures/full_occurrences.png",
+  plot = p_full,
+  width = 6,
+  height = 5
+)

@@ -1,8 +1,9 @@
 ### Script to add elevation data to species occurrences
 
 # Disable s2 geometry engine
-#can avoid issues during spatial operations
+#to avoid issues during spatial operations
 sf_use_s2(FALSE)
+
 
 ##1. Load the ecosystem dataset
 matrix_full_eco <- read.csv("data/matrix_full_eco.csv")
@@ -10,12 +11,14 @@ matrix_full_eco <- read.csv("data/matrix_full_eco.csv")
 head(matrix_full_eco)
 summary(matrix_full_eco)
 
-##2. Load Switzerland boundary (from Natural Earth)
+
+##2. Load Switzerland boundary
 Switzerland <- ne_countries(
   scale = "medium",
   returnclass = "sf",
   country = "Switzerland"
 )
+
 
 ##3. Download elevation raster
 # z controls raster resolution
@@ -32,11 +35,13 @@ plot(
   main = "Elevation raster of Switzerland"
 )
 
+
 ##4. Convert occurrence coordinates to spatial points
 spatial_points <- SpatialPoints(
   coords = matrix_full_eco[, c("longitude", "latitude")],
   proj4string = CRS("+proj=longlat +datum=WGS84")
 )
+
 
 ##5. Extract elevation values
 elevation_values <- raster::extract(
@@ -45,6 +50,7 @@ elevation_values <- raster::extract(
 )
 
 head(elevation_values)
+
 
 ##6. Add elevation values to dataset
 matrix_full_eco_elev <- matrix_full_eco %>%
@@ -57,8 +63,8 @@ matrix_full_eco_elev <- matrix_full_eco_elev %>%
 head(matrix_full_eco_elev)
 summary(matrix_full_eco_elev)
 
-##7. Visualization of elevation distributions
 
+##7. Visualization of elevation distributions
 # Cleaning
 # Remove groups with <2 points since density plots require distributions
 plot_data <- matrix_full_eco_elev %>%
@@ -77,16 +83,26 @@ p_elev <- ggplot(
   geom_density(alpha = 0.5, adjust = 3) +
   theme_classic() +
   labs(
-    title = "Elevation distribution by ecosystem type",
+    title = "Elevation distribution by climate category",
     x = "Elevation (m)",
     y = "Density"
   )
 
 print(p_elev)
 
+
 ##8. Save enriched dataset
 write.csv(
   matrix_full_eco_elev,
   "data/matrix_full_eco_elev.csv",
   row.names = FALSE
+)
+
+
+##9. Save figure
+ggsave(
+  "data/figures/elevation_distribution.png",
+  plot = p_elev,
+  width = 8,
+  height = 5
 )

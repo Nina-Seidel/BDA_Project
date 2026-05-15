@@ -1,37 +1,30 @@
-### Script qui sert à lancer les scripts de src en une fois
-##Install packages if necessary
+### Main script to run the full analysis pipeline
+
+##1. Install packages if necessary
 #install.packages(c(
 #   "rgbif", "rinat", "dplyr", "Rchelsa",
 #   "tidyverse", "sf", "rnaturalearth", "rnaturalearthdata",
-#   "ggplot2", "ggrepel", "ggiraph", "plotly", "leaflet",
+#   "ggplot2", "ggrepel", "Rcpp", "ggiraph", "plotly", "leaflet",
 #   "MASS", "viridis", "elevatr", "raster", "terra", "rayshader"
 #))
 
-#install.packages('luna', repos='https://rspatial.r-universe.dev')
 
-##Load packages
-library(rgbif) #GBIF
-library(rinat) #iNaturalist
-library(dplyr) #Manipulation des données
-library(raster) # to read and manipulate raster files
-library(sf) # to handle vector spatial data
-library(rnaturalearth) # to download country boundaries
-library(ggplot2) # to create graphs
-library(elevatr)   # download elevation data
-library(Rchelsa)
-library(terra)
-library(tidyverse)
-library(rnaturalearthdata)
-library(ggrepel)
-library(ggiraph)
-library(plotly)
-library(leaflet)
-library(MASS)
-library(viridis)
-library(rayshader)
-library(luna)
-library(MODIStsp)
-library(appeears)
+##2. Load packages
+library(rgbif)              # GBIF data
+library(rinat)              # iNaturalist data
+library(dplyr)              # Data manipulation
+library(ggplot2)            # Visualisation
+library(sf)                 # Vector spatial data handling
+library(rnaturalearth)      # Country boundaries
+library(rnaturalearthdata)  
+library(raster)             # Raster data handling
+library(terra)              # Raster data handling (terra is newer than raster)
+library(elevatr)            # Elevation data
+library(Rchelsa)            # CHELSA Climate data
+
+
+##3. Save figures in a folder
+#dir.create("data/figures", showWarnings = FALSE)
 
 ##Run code
 source("./src/1. orchid.r")
