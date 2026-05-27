@@ -25,7 +25,8 @@ library(Rchelsa)            # CHELSA Climate data
 ##3. Save figures in a folder
 #dir.create("data/figures", showWarnings = FALSE)
 
-##Run code
+
+##4. Run code
 source("./src/1. orchid.r")
 source("./src/2. bumblebee.r")
 source("./src/3. matrix_full.r")

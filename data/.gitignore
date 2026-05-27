@@ -1,2 +1,3 @@
-data/*.tif
-data/modis/
+*.mp4
+*.zip
+*.tif
