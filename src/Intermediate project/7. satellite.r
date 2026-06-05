@@ -94,8 +94,28 @@ points_vect <- vect(
 points_vect <- project(points_vect, crs(ndvi_switzerland))
 
 # Visual check
-plot(ndvi_switzerland, main = "Sampling points over NDVI")
-plot(points_vect, add = TRUE, col = "red", pch = 16)
+windows()
+
+plot(
+  ndvi_switzerland,
+  main = "Sampling points over NDVI"
+)
+
+plot(
+  points_vect,
+  add = TRUE,
+  pch = 16,
+  cex = 0.8,
+  col = species_colors[matrix_full_climate$species]
+)
+
+legend(
+  "bottomleft",
+  legend = names(species_colors),
+  col = species_colors,
+  pch = 16,
+  bty = "n"
+)
 
 
 ##8. Extract NDVI values at occurrence locations

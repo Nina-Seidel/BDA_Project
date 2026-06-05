@@ -53,15 +53,24 @@ Switzerland <- ne_countries(
 )
 
 windows()
+
 p_full <- ggplot(data = Switzerland) +
   geom_sf(fill = "grey95") +
   geom_point(
     data = matrix_full,
-    aes(x = longitude, y = latitude, color = species),
+    aes(
+      x = longitude,
+      y = latitude,
+      color = species
+    ),
     size = 2
   ) +
+  scale_color_manual(values = species_colors) +
   theme_classic() +
-  labs(title = "Occurrences des deux espèces en Suisse")
+  labs(
+    title = "Occurrences of both species in Switzerland",
+    color = "Species"
+  )
 
 print(p_full)
 

@@ -48,8 +48,27 @@ spatial_points <- SpatialPoints(
 
 # Plot occurrences on raster
 windows()
-plot(ecosystem_ch, main = "Occurrences on ecosystem map")
-plot(spatial_points, add = TRUE, pch = 16, cex = 1)
+
+plot(
+  ecosystem_ch,
+  main = "Species occurrences on ecosystem map"
+)
+
+plot(
+  spatial_points,
+  add = TRUE,
+  pch = 16,
+  cex = 1.1,
+  col = species_colors[matrix_full$species]
+)
+
+legend(
+  "bottomleft",
+  legend = names(species_colors),
+  col = species_colors,
+  pch = 16,
+  bty = "n"
+)
 
 
 ##6. Extract ecosystem values at each point
@@ -81,13 +100,21 @@ head(matrix_full_eco)
 ##9. Visualization (validation step)
 windows()
 
-p_eco <- ggplot(matrix_full_eco, aes(x = Climate_Re, fill = species)) +
+p_eco <- ggplot(
+  matrix_full_eco,
+  aes(
+    x = Climate_Re,
+    fill = species
+  )
+) +
   geom_bar(position = "dodge") +
+  scale_fill_manual(values = species_colors) +
   theme_classic() +
   labs(
     title = "Number of observations per ecosystem type",
     x = "Ecosystem type",
-    y = "Number of observations"
+    y = "Number of observations",
+    fill = "Species"
   )
 # Climate_Re comes from ecosystem classification (categorical climate proxy),
 # not from extracted climate variables (temperature/precipitation)

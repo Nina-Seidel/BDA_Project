@@ -2,15 +2,15 @@
 
 
 ### Intermediate project
-##0. Install packages if necessary
+##0. Preparation
+# Install packages if necessary
 # install.packages(c(
 #   "rgbif", "rinat", "dplyr", "ggplot2",
 #   "sf", "rnaturalearth", "rnaturalearthdata",
 #   "raster", "terra", "elevatr", "Rchelsa"
 # ))
 
-
-##1. Load packages
+# Load packages
 library(rgbif)              # GBIF data
 library(rinat)              # iNaturalist data
 library(dplyr)              # Data manipulation
@@ -23,18 +23,34 @@ library(terra)              # Raster data handling (terra is newer than raster)
 library(elevatr)            # Elevation data
 library(Rchelsa)            # CHELSA Climate data
 
-
-##2. Save figures in a folder
+# Save figures in a folder
 #dir.create("data/figures", showWarnings = FALSE)
 
+# Custom color palette
+species_colors <- c(
+  "Bombus terrestris" = "#D18F00",
+  "Dactylorhiza sambucina" = "#952365"
+)
 
-##3. Run code
+##1. Load orchid data
 source("./src/Intermediate project/1. orchid.r")
+
+##2. Load bumblebee data
 source("./src/Intermediate project/2. bumblebee.r")
+
+##3. Combine datasets and create matrix
 source("./src/Intermediate project/3. matrix_full.r")
+
+##4. Extract ecosystem data
 source("./src/Intermediate project/4. ecosystems.r")
+
+##5. Extract elevation data
 source("./src/Intermediate project/5. elevation.r")
+
+##6. Extract climate data
 source("./src/Intermediate project/6. climate.r")
+
+##7. Extract satellite data
 source("./src/Intermediate project/7. satellite.r")
 
 
@@ -59,6 +75,12 @@ library(rnaturalearth)      # Country boundaries
 library(ggplot2)            # Visualisation
 library(cowplot)            # Combining plots
 library(plotly)             # Interactive plots
+
+# Custom color palette 
+species_colors <- c(
+  "Bombus terrestris" = "#D18F00",
+  "Dactylorhiza sambucina" = "#952365"
+)
 
 
 ##1. Load the final environmental matrix

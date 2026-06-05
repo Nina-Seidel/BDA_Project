@@ -94,7 +94,7 @@ p_bumblebee <- ggplot(data = Switzerland) +
   geom_point(
     data = data_bumblebee,
     aes(x = longitude, y = latitude),
-    color = "darkorange",
+    color = "#D18F00",
     size = 2
   ) +
   theme_classic() +

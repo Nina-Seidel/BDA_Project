@@ -87,25 +87,41 @@ plot_data <- matrix_full_climate %>%
 windows()
 
 # Temperature
-p_temp <- ggplot(plot_data, aes(x = tmax_mean_c, fill = species)) +
+p_temp <- ggplot(
+  plot_data,
+  aes(
+    x = tmax_mean_c,
+    fill = species
+  )
+) +
   geom_density(alpha = 0.5) +
+  scale_fill_manual(values = species_colors) +
   theme_classic() +
   labs(
     title = "Temperature distribution by species",
     x = "Annual mean temperature (°C)",
-    y = "Density"
+    y = "Density",
+    fill = "Species"
   )
 
 print(p_temp)
 
 # Precipitation
-p_prec <- ggplot(plot_data, aes(x = prec_mean_annual, fill = species)) +
+p_prec <- ggplot(
+  plot_data,
+  aes(
+    x = prec_mean_annual,
+    fill = species
+  )
+) +
   geom_density(alpha = 0.5) +
+  scale_fill_manual(values = species_colors) +
   theme_classic() +
   labs(
     title = "Precipitation distribution by species",
     x = "Annual precipitation",
-    y = "Density"
+    y = "Density",
+    fill = "Species"
   )
 
 print(p_prec)

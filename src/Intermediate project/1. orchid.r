@@ -94,7 +94,7 @@ p_orchid <- ggplot(data = Switzerland) +
   geom_point(
     data = data_orchid,
     aes(x = longitude, y = latitude),
-    color = "darkgreen",
+    color = "#952365",
     size = 2
   ) +
   theme_classic() +
