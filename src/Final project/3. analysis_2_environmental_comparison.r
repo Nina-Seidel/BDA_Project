@@ -14,10 +14,10 @@ plot_data <- matrix_analysis %>%
   )
 
 
-##2. Create boxplots
+##2. Create violin plots
 windows()
 
-p_box <- ggplot(
+p_violin <- ggplot(
   plot_data,
   aes(
     x = species,
@@ -25,7 +25,15 @@ p_box <- ggplot(
     fill = species
   )
 ) +
-  geom_boxplot() +
+  geom_violin(
+    alpha = 0.7,
+    trim = FALSE
+  ) +
+  geom_boxplot(
+    width = 0.12,
+    fill = "white",
+    outlier.size = 0.8
+  ) +
   scale_fill_manual(values = species_colors) +
   facet_wrap(
     ~Variable,
@@ -37,45 +45,39 @@ p_box <- ggplot(
     plot.margin = ggplot2::margin(5, 5, 5, 5)
   ) +
   labs(
-    title = "Environmental variables by species",
+    title = "Environmental distributions by species",
     x = "Species",
     y = "Value",
     fill = "Species"
   )
 
-print(p_box)
+print(p_violin)
 
 
 ##3. Interpretation
-# Elevation: 
-# Dactylorhiza sambucina is found at higher elevations than Bombus terrestris,
-# with limited overlap between the two species.
+# The violin plots show how each species uses the environment.
 
-# NDVI:
-# NDVI values are largely overlapping between the two species, 
-# suggesting similar vegetation conditions.
+# Elevation is the biggest difference:
+# - Dactylorhiza sambucina lives higher
+# - Bombus terrestris lives lower
 
-# Precipitation (prec_mean_annual):
-# Precipitation shows overlap between the two species, 
-# but Bombus terrestris tends to have a slightly higher median precipitation,
-# which may reflect its occurrence in more humid lowland areas.
+# NDVI is very similar, so both species live in similar vegetation.
 
-# Temperature (tmax_mean_c):
-# Bombus terrestris is associated with higher temperatures, 
-# consistent with its occurence at lower elevations.
-# Dactylorhiza sambucina is found in cooler conditions, 
-# reflecting its alpine habitat.
+# Precipitation is also quite similar for both species.
 
-# Overall, Dactylorhiza sambucina shows a broader distribution 
-# across environmental variables. 
-# However, this pattern may partly reflect differences in sampling effort
-# rather than true ecological range.
+# Temperature shows some difference, linked to elevation:
+# - Dactylorhiza lives higher, so in colder environments
+# - Bombus terrestris lives lower, so in warmer environments
+
+# Dactylorhiza sambucina seems more variable,
+# but this may be due to more observations.
 
 
 ##4. Save figure
 ggsave(
   "data/figures/environmental_comparison.png",
-  plot = p_box,
-  width = 10,
-  height = 6
+  plot = p_violin,
+  width = 11,
+  height = 6.5,
+  dpi = 300
 )

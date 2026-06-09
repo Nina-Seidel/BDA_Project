@@ -2,7 +2,7 @@
 
 ##1. Run PCA
 pca <- prcomp(
-  matrix_analysis[, -1],  # on enlève species
+  matrix_analysis[, -1],  # remove species column
   scale. = TRUE
 )
 
@@ -10,48 +10,49 @@ summary(pca)
 str(pca)
 
 
-##2. Plot PCA
+##2. Plot PCA biplot
 windows()
 
-p_pca <- fviz_pca_ind(
+p_pca <- fviz_pca_biplot(
   pca,
-  geom = "point",
+  geom.ind = "point",
   col.ind = matrix_analysis$species,
   palette = species_colors,
   addEllipses = TRUE,
+  label = "var",
+  col.var = "black",
+  repel = TRUE,
   legend.title = "Species"
-)
+) +
+  theme_classic() +
+  labs(
+    title = "PCA biplot: environmental gradients",
+    color = "Species"
+  )
 
 print(p_pca)
 
-fviz_pca_var(pca)
-
 
 ##3. Interpretation
+# The PCA shows a main environmental gradient.
+# This gradient is mostly linked to elevation and temperature.
 
-# The PCA shows a strong environmental gradient along the first axis (PC1),
-# which explains more than 80% of the total variance.
-# PC1 mainly represents an altitudinal and climatic gradient.  
-# The two species show a partial separation along this axis, 
-# suggesting differences in their environmental niches.
-# However, the overlap between the two indicates that they also share 
-# some of their environmental niches. 
-# Interestingly, Dactylorhiza sambucina appears more widely distributed
-# across the PCA space, suggesting a larger range of environmental conditions
-# compared to Bombus terrestris, which is more clustered.
+# The two species are a bit separated:
+# - Dactylorhiza sambucina is found in colder and higher places
+# - Bombus terrestris is found in warmer areas
+
+# However, there is some overlap.
+# This means the two species can live in similar environments.
+
+# Dactylorhiza sambucina looks more spread,
+# but this may be due to more data, not real ecology.
 
 
-##4. Save figures
+##4. Save figure
 ggsave(
-  "data/figures/pca.png",
+  "data/figures/pca_biplot.png",
   plot = p_pca,
-  width = 6,
-  height = 5
-)
-
-ggsave(
-  "data/figures/pca_variables.png",
-  plot = fviz_pca_var(pca),
-  width = 6,
-  height = 5
+  width = 7,
+  height = 6,
+  dpi = 300
 )

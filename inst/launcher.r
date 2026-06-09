@@ -1,6 +1,5 @@
 ### Main script to run the full analysis pipeline
 
-
 ### Intermediate project
 ##0. Preparation
 # Install packages if necessary
@@ -61,7 +60,7 @@ source("./src/Intermediate project/7. satellite.r")
 # install.packages(c(
 #   "tidyverse", "FactoMineR", "factoextra", "randomForest",
 #   "terra", "sf", "rnaturalearth", "ggplot2", "cowplot",
-#   "plotly"
+#   "plotly", "elevatr", "raster", "rayshader"
 # ))
 
 # Load packages
@@ -75,6 +74,9 @@ library(rnaturalearth)      # Country boundaries
 library(ggplot2)            # Visualisation
 library(cowplot)            # Combining plots
 library(plotly)             # Interactive plots
+library(elevatr)            # Elevation data
+library(raster)             # Raster data handling
+library(rayshader)          # 3D visualisation
 
 # Custom color palette 
 species_colors <- c(
@@ -100,3 +102,11 @@ source("./src/Final project/5. analysis_4_summary_panel.r")
 
 ##6. Optional interactive, animated or other advanced figure
 source("./src/Final project/6. analysis_5_advanced_plot.r")
+
+
+##7. Additional comments
+# I acknowledge the use of ChatGPT for assistance in code writing and troubleshooting, 
+# as well as for improving the clarity of comments and interpretations. 
+# However, all analyses, code structuring, figure design, and ecological interpretations
+# were performed by myself, and I take full responsibility for the content of this project.
+

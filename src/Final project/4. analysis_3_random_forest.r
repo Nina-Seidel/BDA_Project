@@ -24,7 +24,10 @@ windows()
 
 p_rf <- ggplot(
   importance_df,
-  aes(x = reorder(Variable, Importance), y = Importance)
+  aes(
+    x = reorder(Variable, Importance),
+    y = Importance
+  )
 ) +
   geom_col(fill = "#4E6A7A") +
   coord_flip() +
@@ -33,35 +36,34 @@ p_rf <- ggplot(
     plot.margin = ggplot2::margin(5, 5, 5, 5)
   ) +
   labs(
-    title = "Variable importance",
+    title = "Environmental variable importance",
     x = "",
-    y = "Importance"
+    y = "Mean decrease in accuracy"
   )
 
 print(p_rf)
 
 
 ##4. Interpretation
-# The random forest model shows that elevation is the most important
-# variable explaining species distribution, followed by precipitation,
-# temperature and NDVI.
-# This confirms the strong role of the altitudinal gradient observed 
-# in the previous analyses.
+# The model works well to separate the two species.
 
-# Although precipitation differences were less visible in the boxplots,
-# the model suggests that it still contributes to distinguishing the two species.
+# Elevation is the most important variable.
 
-# NDVI appears to be the least important variable, which is consistent
-# with the strong overlap observed between species in the boxplots.
+# Temperature and precipitation are also important.
 
-# Overall, the random forest results are consistent with the patterns
-# observed in the PCA and environmental comparisons.
+# NDVI is less important.
+
+# This means species differences are mainly explained
+# by elevation and climate, not vegetation.
+
+# The model has a low error rate (4.41%), so the results are reliable.
 
 
 ##5. Save figure
 ggsave(
   "data/figures/random_forest_importance.png",
   plot = p_rf,
-  width = 6,
-  height = 4
+  width = 7,
+  height = 4.5,
+  dpi = 300
 )

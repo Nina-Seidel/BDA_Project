@@ -14,18 +14,18 @@ table(matrix_full$species)
 
 ##3. Define ecological question
 
-# This project investigates whether an alpine orchid 
-# (Dactylorhiza sambucina) and a generalist pollinator 
-# (Bombus terrestris) occupy similar environmental niches 
-# along an altitudinal gradient.
+# Ecological question:
+# Do the alpine orchid Dactylorhiza sambucina and a generalist bumblebee, 
+#Bombus terrestris, occupy similar environmental niches?
 
 # Objectives:
-# - Compare environmental conditions between species
-# - Identify key variables explaining their distribution
-# - Assess whether they respond similarly to environmental gradients
+# - Compare the environmental distributions of both species
+# - Identify the main environmental gradients structuring species occurrence
+# - Evaluate which environmental variables differentiate best the two species
 
 
 ##4. Prepare dataset for analysis
+# Select variables for environmental analysis
 matrix_analysis <- matrix_full %>%
   select(species, elevation, tmax_mean_c, prec_mean_annual, NDVI)
 
